@@ -42,6 +42,9 @@ func runScreenLoop(game *Game, screen tcell.Screen) {
 			if event.Key() == tcell.KeyCtrlC || event.Key() == tcell.KeyEscape {
 				return
 			}
+			if !game.Running() && event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+				return
+			}
 			updateSentence(game, screen)
 			updateCursor(game, screen)
 		case *tcell.EventResize:

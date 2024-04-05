@@ -19,7 +19,7 @@ const (
 
 type Game struct {
 	sentence       string
-	tokens         []string
+	Tokens         []string
 	WordController *WordController
 	WordIndex      int
 	Timer          *Timer
@@ -29,7 +29,7 @@ type Game struct {
 func NewGame(sentence string) *Game {
 	return &Game{
 		sentence:       sentence,
-		tokens:         strings.Split(sentence, " "),
+		Tokens:         strings.Split(sentence, " "),
 		WordController: NewWordController(),
 		WordIndex:      0,
 		Timer:          NewTimer(),
@@ -46,7 +46,7 @@ func (g *Game) Sentence() string {
 	case STATE_WELCOME:
 		return "Press 's' to start"
 	case STATE_FINISHED:
-		return g.sentence + "\nPress 'r' to restart"
+		return g.sentence + "\nPress 's' to restart\nPress 'q' to quit"
 	default:
 		return g.sentence
 	}
@@ -62,7 +62,7 @@ func (g *Game) Countdown() {
 		g.sentence += fmt.Sprintf("%d...", i)
 		time.Sleep(time.Second)
 	}
-	g.sentence = strings.Join(g.tokens, " ")
+	g.sentence = strings.Join(g.Tokens, " ")
 }
 
 func (g *Game) Start() {
@@ -85,16 +85,12 @@ func (g *Game) Stop() {
 
 func (g *Game) TakeInput(input *tcell.EventKey) {
 	switch g.State {
-	case STATE_WELCOME:
+	case STATE_WELCOME, STATE_FINISHED:
 		if input.Key() == tcell.KeyRune && input.Rune() == 's' {
 			go g.Start()
 		}
 	case STATE_RUNNING:
 		g.runGameLoop(input)
-	case STATE_FINISHED:
-		if input.Key() == tcell.KeyRune && input.Rune() == 'r' {
-			go g.Start()
-		}
 	default:
 		// do nothing
 	}
@@ -103,16 +99,16 @@ func (g *Game) TakeInput(input *tcell.EventKey) {
 func (g *Game) runGameLoop(input *tcell.EventKey) {
 	g.WordController.TakeInput(input)
 	word := g.WordController.CurrentWord()
-	if !strings.Contains(word, " ") && g.WordIndex < len(g.tokens)-1 {
+	if !strings.Contains(word, " ") && g.WordIndex < len(g.Tokens)-1 {
 		return
 	}
 	parts := strings.Split(word, " ")
-	for len(parts) > 0 && g.WordIndex < len(g.tokens) && parts[0] == g.tokens[g.WordIndex] {
+	for len(parts) > 0 && g.WordIndex < len(g.Tokens) && parts[0] == g.Tokens[g.WordIndex] {
 		g.WordIndex++
 		parts = parts[1:]
 		g.WordController.TrimFirstWord()
 	}
-	if g.WordIndex == len(g.tokens) {
+	if g.WordIndex == len(g.Tokens) {
 		g.Stop()
 	}
 }

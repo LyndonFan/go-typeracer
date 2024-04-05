@@ -12,7 +12,7 @@ const COMBINING_UNDERLINE rune = 0x0332
 func displayEntireGame(game *Game, screen tcell.Screen) {
 	screen.Clear()
 	width, height := screen.Size()
-	displayText(screen, 0, 1, game.Sentence())
+	displaySentence(screen, 0, 1, game)
 	timeElapsed := int(game.Timer.Duration().Seconds())
 	displayText(screen, width-5, 0, fmt.Sprintf("%02d:%02d", timeElapsed/60, timeElapsed%60))
 	displayWordController(screen, 0, height-2, game.WordController)
@@ -23,7 +23,7 @@ func updateSentence(game *Game, screen tcell.Screen) {
 	if !game.Running() {
 		return
 	}
-	displayText(screen, 0, 1, game.Sentence())
+	displaySentence(screen, 0, 1, game)
 	screen.Show()
 }
 
@@ -87,5 +87,37 @@ func displayWordController(s tcell.Screen, startX, startY int, wc *WordControlle
 	}
 	if cur == len(word) {
 		s.SetContent(x, y, '_', nil, tcell.StyleDefault)
+	}
+}
+
+func displaySentence(s tcell.Screen, startX, startY int, g *Game) {
+	if g.State != STATE_RUNNING {
+		displayText(s, startX, startY, g.Sentence())
+		return
+	}
+	x, y := startX, startY
+	width, _ := s.Size()
+	n := len(g.Tokens)
+	for i, tkn := range g.Tokens {
+		combiningRunes := []rune{}
+		if i == g.WordIndex {
+			combiningRunes = []rune{COMBINING_UNDERLINE}
+		}
+		for _, r := range tkn {
+			s.SetContent(x, y, r, combiningRunes, tcell.StyleDefault)
+			x++
+			if x >= width {
+				x = startX
+				y++
+			}
+		}
+		if i < n-1 {
+			s.SetContent(x, y, ' ', nil, tcell.StyleDefault)
+			x++
+			if x >= width {
+				x = startX
+				y++
+			}
+		}
 	}
 }
