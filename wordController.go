@@ -26,6 +26,11 @@ func (wc *WordController) Cursor() int {
 	return wc.cursor
 }
 
+func (wc *WordController) Reset() {
+	wc.cursor = 0
+	wc.currentWord = []rune{}
+}
+
 func (wc *WordController) TrimFirstWord() {
 	firstSpaceIndex := slices.Index(wc.currentWord, ' ')
 	if firstSpaceIndex == -1 {

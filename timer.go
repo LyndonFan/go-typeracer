@@ -23,6 +23,9 @@ func (t *Timer) Stop() {
 }
 
 func (t *Timer) Duration() time.Duration {
+	if t.Running {
+		return time.Since(t.StartTime)
+	}
 	return t.EndTime.Sub(t.StartTime)
 }
 
