@@ -66,7 +66,7 @@ func (g *Game) Countdown() {
 }
 
 func (g *Game) Start() {
-	if g.State != STATE_WELCOME {
+	if g.State == STATE_COUNTDOWN || g.State == STATE_RUNNING {
 		return
 	}
 	g.WordIndex = 0
@@ -78,8 +78,9 @@ func (g *Game) Start() {
 }
 
 func (g *Game) Stop() {
-	g.State = STATE_FINISHED
 	g.Timer.Stop()
+	g.State = STATE_FINISHED
+	g.WordController.Reset()
 }
 
 func (g *Game) TakeInput(input *tcell.EventKey) {
