@@ -18,6 +18,7 @@ const (
 )
 
 type Game struct {
+	quoteGenerator *QuoteGenerator
 	sentence       string
 	Tokens         []string
 	WordController *WordController
@@ -26,15 +27,19 @@ type Game struct {
 	State          State
 }
 
-func NewGame(sentence string) *Game {
-	return &Game{
-		sentence:       sentence,
-		Tokens:         strings.Split(sentence, " "),
+func NewGame() (*Game, error) {
+	q, err := NewQuotesGenerator()
+	if err != nil {
+		return nil, err
+	}
+	g := Game{
+		quoteGenerator: q,
 		WordController: NewWordController(),
 		WordIndex:      0,
 		Timer:          NewTimer(),
 		State:          STATE_WELCOME,
 	}
+	return &g, nil
 }
 
 func (g *Game) Running() bool {
@@ -50,6 +55,12 @@ func (g *Game) Sentence() string {
 	default:
 		return g.sentence
 	}
+}
+
+func (g *Game) RefreshSentence() {
+	quote := g.quoteGenerator.GetNextQuote()
+	g.sentence = quote
+	g.Tokens = strings.Split(quote, " ")
 }
 
 const COUNTDOWN_SECONDS int = 3
@@ -71,6 +82,7 @@ func (g *Game) Start() {
 	}
 	g.WordIndex = 0
 	g.WordController.Reset()
+	g.RefreshSentence()
 	g.Countdown()
 	g.Timer.Reset()
 	g.State = STATE_RUNNING

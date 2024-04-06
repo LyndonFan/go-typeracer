@@ -57,3 +57,9 @@ classDiagram
     Game --* Display
     WordController --* Display
 ```
+
+## Credits
+
+Firstly, myself for actually setting the intention to do this.
+
+More importantly, for Luke and his [quotable API](https://github.com/lukePeavey/quotable), which is where the sentences come from. (I did a one-off scrap of some quotes so no worries about bombarding his API.)

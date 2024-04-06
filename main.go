@@ -15,8 +15,10 @@ func main() {
 		panic(err)
 	}
 	defer screen.Fini()
-	sentence := "The quick brown fox jumps over the lazy dog."
-	game := NewGame(sentence)
+	game, err := NewGame()
+	if err != nil {
+		panic(err)
+	}
 	runScreenLoop(game, screen)
 }
 
